@@ -2,7 +2,7 @@
 
 ** Profiling
 
-Profiling is a way to track and minimize the startup time of Emacs. The current config takes about 3 seconds to load in my computer. I use the profile-dotemacs file for all the profiling. Since my Init file already takes care of initializing packages, I need not do it here. However, while profiling, I profile my init.el separately and the config.el this Org file creates separately. In order for the config.el file to be profiled separately, the packages need to be initialized again. For now, I tell Emacs to not include the code below into the config.el file by explicitly giving the option :tangle no. This option can be viewed by clicking the Raw view file option on GitHub or just opening the Org file in Emacs. When I want to profile it, I just change the no to yes and call the aliases I have set up in my dotfiles from the terminal.
+
 
 #+BEGIN_SRC emacs-lisp :tangle no
 
@@ -24,7 +24,7 @@ Profiling is a way to track and minimize the startup time of Emacs. The current 
 
 * Custom file
 
-Emacs has a built-in customization interface that helps beginners customize a lot of options. However it is limited and one needs to grok some Emacs Lisp anyway. Sometimes, I change stuff in my configuration that invokes/adds via the customization interface. This results in automatic inserting of some code into my init.el which messes up the version control. We tell Emacs to store in a separate file and load it if it exists.
+
 
 #+BEGIN_SRC emacs-lisp
 
@@ -38,7 +38,7 @@ Emacs has a built-in customization interface that helps beginners customize a lo
 
 ** Disabling some GUI elements
 
-Emacs has a different GUI implementation to that of its terminal implementation and I prefer the GUI any day. But there are some things that I find annoying - like tool bar, menu bar, scroll bar and the tool tip. Therefore, I disable it.
+
 
 #+BEGIN_SRC emacs-lisp
 
@@ -51,7 +51,7 @@ Emacs has a different GUI implementation to that of its terminal implementation 
 
 ** Set the initial frame size
 
-Frames in Emacs parlance are the equivalent of windows in normal usage. So, when you open Emacs, it opens a frame and not a window. Windows are the what splits are referred to. For further reference look it up in the Emacs manual.
+
 
 #+BEGIN_SRC emacs-lisp
 
@@ -69,7 +69,7 @@ Frames in Emacs parlance are the equivalent of windows in normal usage. So, when
 
 ** Initial screen
 
-The default screen of Emacs is just so useless and cluttered with links and text and help pages. I just need a simple start screen which gently reminds me some things that are important while staying out of the most of the time. This is also called the scratch buffer.
+
 
 
 #+BEGIN_SRC emacs-lisp
@@ -86,7 +86,7 @@ The default screen of Emacs is just so useless and cluttered with links and text
 
 ** Startup echo message
 
-There is a small advert for GNU that is displayed in the mini-buffer during startup and, of course, there is a way to change it.
+
 
 #+BEGIN_SRC emacs-lisp
 
@@ -98,7 +98,6 @@ There is a small advert for GNU that is displayed in the mini-buffer during star
 #+END_SRC
 
 ** Backups
-Emacs takes regular backups of once you switch on auto-saving and, by default, puts the backups in the same directory. This is annoying most of the time since I tend to save pretty often and also clobbers with my file system tree when I’m trying to search within the files. Therefore, Emacs wiki has a pretty nice solution for that, which keeps various versions of the backup file and stores it under a folder in the home directory.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -114,7 +113,7 @@ Emacs takes regular backups of once you switch on auto-saving and, by default, p
 #+END_SRC
 
 ** Auto saving
-I make sure Emacs auto-saves often but the result is that it messes up my file tree. So, let’s ask Emacs to store its backups in some temporary directory.
+
 
 #+BEGIN_SRC emacs-lisp
 
@@ -135,7 +134,6 @@ UTF-8 works for most of the files I tend to use
 #+END_SRC
 
 ** Error message
-Mac has an annoying bug when visibly warning you about errors. I hate it. And while we’re at it, let’s ask Emacs to ignore the audible warning too.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -145,7 +143,6 @@ Mac has an annoying bug when visibly warning you about errors. I hate it. And wh
 #+END_SRC
 
 ** Truncating lines
-Emacs has an option to wrap lines which is disabled by default. What this means is that, if the text goes beyond the screen, it will wrap it so that you can see all the text. However, it wraps it with these weird indicators that I find more annoying. Plus, I make sure my code stays within 100 characters always and prefer the soft line wrap while writing prose. Let’s make sure it doesn’t wrap again.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -155,7 +152,6 @@ Emacs has an option to wrap lines which is disabled by default. What this means 
 #+END_SRC
 
 ** Large file warning
-Whenever, a large file (by Emacs standards) is opened, it asks for confirmation whether we really want to open it but the problem is the limit for this file is set pretty low. Let’s increase it a bit so that it doesn’t prompt so often.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -164,7 +160,6 @@ Whenever, a large file (by Emacs standards) is opened, it asks for confirmation 
 #+END_SRC
 
 ** Lazier prompting
-While we are in the topic of prompting, a lot of the default prompts ask for a yes or a no. I’m lazy and so I don’t want to type the full words. Let’s just make it accept y or n.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -174,7 +169,6 @@ While we are in the topic of prompting, a lot of the default prompts ask for a y
 
 
 ** Expand some words and auto-correct
-abbrev-mode or abbreviation mode is a built-in mode that auto-corrects the word you mistype on pressing space. For how I practically use it, see the auto-correction section.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -184,7 +178,6 @@ abbrev-mode or abbreviation mode is a built-in mode that auto-corrects the word 
 #+END_SRC
 
 ** gdb
-gdb is the GNU debugger which is used to debug programs. Let’s make it multi-windowed like all the other debuggers out there.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -194,7 +187,6 @@ gdb is the GNU debugger which is used to debug programs. Let’s make it multi-w
 #+END_SRC
 
 ** ediff
-Ediff mode is a UNIX patching tool and my version controlling package uses this to help resolve merge conflicts and having some better defaults will be useful for this.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -203,7 +195,6 @@ Ediff mode is a UNIX patching tool and my version controlling package uses this 
 #+END_SRC
 
 ** tramp
-Tramp lets you edit files remotely from your local Emacs which is useful because it lets you have all the default configuration. Let’s make sure the default protocol is ssh.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -214,7 +205,6 @@ Tramp lets you edit files remotely from your local Emacs which is useful because
 #+END_SRC
 
 ** Move correctly over camelCased words
-subword-mode is a built-in mode that helps moving over camelCase words correctly.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -223,7 +213,6 @@ subword-mode is a built-in mode that helps moving over camelCase words correctly
 #+END_SRC
 
 ** Understand the more common sentence
-By default, Emacs thinks a sentence is a full-stop followed by 2 spaces. Let’s make it full-stop and 1 space.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -232,7 +221,6 @@ By default, Emacs thinks a sentence is a full-stop followed by 2 spaces. Let’s
 #+END_SRC
 
 ** Recenter screen
-Emacs lets you move the current line to the top, middle or bottom of the screen to get appropriate context. The default goes to the middle first. I prefer that the default goes to the top first. Let’s change this.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -241,7 +229,6 @@ Emacs lets you move the current line to the top, middle or bottom of the screen 
 #+END_SRC
 
 ** Better wild cards in search
-The built-in incremental search is pretty good but the most common regex I type is .* which stands for anything. This makes sure space between words acts the same way. It’s much better for me to use it now.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -250,7 +237,6 @@ The built-in incremental search is pretty good but the most common regex I type 
 #+END_SRC
 
 ** Persistent history
-I prefer to have some persistent history for some prompts.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -259,7 +245,6 @@ I prefer to have some persistent history for some prompts.
 #+END_SRC
 
 ** Narrow to region
-This is such a an amazing feature but is disabled by default. Let’s re-enable it. For further reference on narrow region, refer to the Emacs manual.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -277,7 +262,6 @@ Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and
 #+END_SRC
 
 * Window management
-Winner mode is an Emacs built-in package that lets you undo and redo window configurations. Incredibly useful since I keep splitting and merging windows all the time. Let’s enable it.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -287,7 +271,6 @@ Winner mode is an Emacs built-in package that lets you undo and redo window conf
 #+END_SRC
 
 * Recent files
-An Emacs “mode” is a collection of behavior. It has both major and minor modes. One such useful mode is the recentf-mode, which stands for recent files mode. Let’s give configure some options and enable it.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -299,7 +282,6 @@ An Emacs “mode” is a collection of behavior. It has both major and minor mod
 #+END_SRC
 
 * Fonts
-Switching font is something I do quite often. Also, zooming in text isn’t the same as just increasing the font size. So, these are some convenience functions taken from Jay Dixit’s emacs configuration and Oleh Krehel’s configuration.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -353,7 +335,6 @@ Switching font is something I do quite often. Also, zooming in text isn’t the 
 #+END_SRC
 
 * Use package macro
-use-package is a macro that helps in downloading and managing package a breeze. It has lots of options for lazy loading and configurations and this configuration relies on it completely for all package management. This is a requirement. The following piece of code checks if it is already installed and installs it if it is not and also loads it and bind-key. I should extend this to add key words for :modalka and :which-key.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -367,7 +348,6 @@ use-package is a macro that helps in downloading and managing package a breeze. 
 #+END_SRC
 
 * Diminish minor modes from the mode line
-Now that we have made sure we have installed use-package, we will make sure another nice package to change the mode-line minor mode list. For this, we can use use-package itself and also go ahead and diminish some built-in minor modes.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -382,10 +362,8 @@ Now that we have made sure we have installed use-package, we will make sure anot
 
 #+END_SRC
 
-However, some built-in minor modes are notorious and don’t seem to work with the above method. Let’s diminish them using functions one by one.
 
 ** Diminish org-indent mode
-I like to enable the org-indent mode for a clean view in Org mode and this doesn’t seem to get diminish the usual way. We define a function and a add a hook to achieve this.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -397,7 +375,6 @@ I like to enable the org-indent mode for a clean view in Org mode and this doesn
 #+END_SRC
 
 ** Diminish auto-revert mode
-auto-revert mode is useful when Emacs auto-saves your file and you want to load the backup.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -409,7 +386,6 @@ auto-revert mode is useful when Emacs auto-saves your file and you want to load 
 #+END_SRC
 
 ** Diminish eldoc mode
-Eldoc mode is a mode to display documentation for languages in Emacs
 
 #+BEGIN_SRC emacs-lisp
 
@@ -421,7 +397,6 @@ Eldoc mode is a mode to display documentation for languages in Emacs
 #+END_SRC
 
 ** Diminish subword mode
-subword-mode is described here.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -434,7 +409,6 @@ subword-mode is described here.
 
 
 * Manage the built-in flyspell mode
-Flyspell mode is a built-in mode for prose spell-checking. It sometimes slows down Emacs. It also has flyspell-prog-mode which checks for spelling in programming comments.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -459,7 +433,6 @@ Flyspell mode is a built-in mode for prose spell-checking. It sometimes slows do
 #+END_SRC
 
 * Add a package to set the correct path
-Sometimes when opening the Mac Emacs.app via GUI, by clicking the button, it doesn’t load all the proper utilities from the OS. This package fixes that.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -475,7 +448,6 @@ Sometimes when opening the Mac Emacs.app via GUI, by clicking the button, it doe
 #+END_SRC
 
 * Add some useful libraries
-async, s, dash, and cl-lib are libraries for asynchronous processing, string manipulation, list manipulation and backward compatibility respectively.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -495,7 +467,6 @@ async, s, dash, and cl-lib are libraries for asynchronous processing, string man
 #+END_SRC
 
 * Restart emacs from emacs
-The heading says it all. I find it useful
 
 #+BEGIN_SRC emacs-lisp
 
@@ -506,7 +477,6 @@ The heading says it all. I find it useful
 
 
 * Bind key to bind some unbound defaults
-There are some pretty nice default functions that are unbound. I use the bind-key package that comes along with use-package to bind these keys. I hijack the M-m (which can be command + m or alt + m depending on how you configure it) prefix. I find the default action bound to M-m - going to the first non-whitespace character in line - pretty useless as our smarter start of line already takes care of this for us.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -541,7 +511,6 @@ There are some pretty nice default functions that are unbound. I use the bind-ke
   ("M-m SPC ?" . describe-bindings))
 #+END_SRC
 * Tangle on save
-This was taken from Alan Pearce’s dotfiles so as to tangle it on save instead of tangling it every time I open it again.
 
 #+BEGIN_SRC emacs-lisp
 
@@ -581,7 +550,7 @@ This was taken from Alan Pearce’s dotfiles so as to tangle it on save instead 
 
 
 
-* Some other shit
+* Auto Gen
 #+BEGIN_SRC emacs-lisp
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
