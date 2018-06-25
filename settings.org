@@ -1,0 +1,651 @@
+* Basic
+
+** Profiling
+
+Profiling is a way to track and minimize the startup time of Emacs. The current config takes about 3 seconds to load in my computer. I use the profile-dotemacs file for all the profiling. Since my Init file already takes care of initializing packages, I need not do it here. However, while profiling, I profile my init.el separately and the config.el this Org file creates separately. In order for the config.el file to be profiled separately, the packages need to be initialized again. For now, I tell Emacs to not include the code below into the config.el file by explicitly giving the option :tangle no. This option can be viewed by clicking the Raw view file option on GitHub or just opening the Org file in Emacs. When I want to profile it, I just change the no to yes and call the aliases I have set up in my dotfiles from the terminal.
+
+#+BEGIN_SRC emacs-lisp :tangle no
+
+(require 'package)
+(package-initialize)
+
+#+END_SRC
+
+
+* Defaults
+
+** Personal Information
+
+#+BEGIN_SRC emacs-lisp
+
+(setq user-full-name "Dataphobe")
+
+#+END_SRC
+
+* Custom file
+
+Emacs has a built-in customization interface that helps beginners customize a lot of options. However it is limited and one needs to grok some Emacs Lisp anyway. Sometimes, I change stuff in my configuration that invokes/adds via the customization interface. This results in automatic inserting of some code into my init.el which messes up the version control. We tell Emacs to store in a separate file and load it if it exists.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+#+END_SRC
+
+* Startup
+
+** Disabling some GUI elements
+
+Emacs has a different GUI implementation to that of its terminal implementation and I prefer the GUI any day. But there are some things that I find annoying - like tool bar, menu bar, scroll bar and the tool tip. Therefore, I disable it.
+
+#+BEGIN_SRC emacs-lisp
+
+(when window-system
+  (tool-bar-mode 0)
+  (scroll-bar-mode 0)
+  (tooltip-mode 0))
+
+#+END_SRC
+
+** Set the initial frame size
+
+Frames in Emacs parlance are the equivalent of windows in normal usage. So, when you open Emacs, it opens a frame and not a window. Windows are the what splits are referred to. For further reference look it up in the Emacs manual.
+
+#+BEGIN_SRC emacs-lisp
+
+;; initial window
+(setq initial-frame-alist
+      '((width . 102)   ; characters in a line
+        (height . 54))) ; number of lines
+
+;; sebsequent frame
+(setq default-frame-alist
+      '((width . 100)   ; characters in a line
+        (height . 52))) ; number of lines
+
+#+END_SRC
+
+** Initial screen
+
+The default screen of Emacs is just so useless and cluttered with links and text and help pages. I just need a simple start screen which gently reminds me some things that are important while staying out of the most of the time. This is also called the scratch buffer.
+
+
+#+BEGIN_SRC emacs-lisp
+
+;; No welcome screen - opens directly in scratch buffer
+(setq inhibit-startup-message t
+      initial-scratch-message ""
+      initial-major-mode 'fundamental-mode
+      inhibit-splash-screen t)
+
+
+#+END_SRC
+
+
+** Startup echo message
+
+There is a small advert for GNU that is displayed in the mini-buffer during startup and, of course, there is a way to change it.
+
+#+BEGIN_SRC emacs-lisp
+
+;; Change the echo message
+(defun display-startup-echo-area-message ()
+  (message "Stop taking it seriously!"))
+
+
+#+END_SRC
+
+** Backups
+Emacs takes regular backups of once you switch on auto-saving and, by default, puts the backups in the same directory. This is annoying most of the time since I tend to save pretty often and also clobbers with my file system tree when I’m trying to search within the files. Therefore, Emacs wiki has a pretty nice solution for that, which keeps various versions of the backup file and stores it under a folder in the home directory.
+
+#+BEGIN_SRC emacs-lisp
+
+;; Backups at .saves folder in the current folder
+(setq backup-by-copying t      ; don't clobber symlinks
+      backup-directory-alist
+      '(("." . "~/.saves"))    ; don't litter my fs tree
+      delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)       ; use versioned backups
+
+#+END_SRC
+
+** Auto saving
+I make sure Emacs auto-saves often but the result is that it messes up my file tree. So, let’s ask Emacs to store its backups in some temporary directory.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
+      create-lockfiles nil)
+
+#+END_SRC
+
+
+** File encoding system
+UTF-8 works for most of the files I tend to use
+
+#+BEGIN_SRC emacs-lisp
+
+(prefer-coding-system 'utf-8)
+(setq-default buffer-file-coding-system 'utf-8-auto-unix)
+
+#+END_SRC
+
+** Error message
+Mac has an annoying bug when visibly warning you about errors. I hate it. And while we’re at it, let’s ask Emacs to ignore the audible warning too.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq visible-bell nil)
+(setq ring-bell-function 'ignore)
+
+#+END_SRC
+
+** Truncating lines
+Emacs has an option to wrap lines which is disabled by default. What this means is that, if the text goes beyond the screen, it will wrap it so that you can see all the text. However, it wraps it with these weird indicators that I find more annoying. Plus, I make sure my code stays within 100 characters always and prefer the soft line wrap while writing prose. Let’s make sure it doesn’t wrap again.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq-default truncate-lines t)
+;;(global-visual-line-mode t) ;; This can mmake tables really ugly in org-mode!!! be careful
+(global-linum-mode t)
+#+END_SRC
+
+** Large file warning
+Whenever, a large file (by Emacs standards) is opened, it asks for confirmation whether we really want to open it but the problem is the limit for this file is set pretty low. Let’s increase it a bit so that it doesn’t prompt so often.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq large-file-warning-threshold (* 15 1024 1024))
+
+#+END_SRC
+
+** Lazier prompting
+While we are in the topic of prompting, a lot of the default prompts ask for a yes or a no. I’m lazy and so I don’t want to type the full words. Let’s just make it accept y or n.
+
+#+BEGIN_SRC emacs-lisp
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+#+END_SRC
+
+
+** Expand some words and auto-correct
+abbrev-mode or abbreviation mode is a built-in mode that auto-corrects the word you mistype on pressing space. For how I practically use it, see the auto-correction section.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq save-abbrevs 'silently)
+(setq-default abbrev-mode t)
+
+#+END_SRC
+
+** gdb
+gdb is the GNU debugger which is used to debug programs. Let’s make it multi-windowed like all the other debuggers out there.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq gdb-many-windows t
+      gdb-show-main t)
+
+#+END_SRC
+
+** ediff
+Ediff mode is a UNIX patching tool and my version controlling package uses this to help resolve merge conflicts and having some better defaults will be useful for this.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq ediff-window-setup-function 'ediff-setup-windows-plain
+      ediff-split-window-function 'split-window-horizontally)
+#+END_SRC
+
+** tramp
+Tramp lets you edit files remotely from your local Emacs which is useful because it lets you have all the default configuration. Let’s make sure the default protocol is ssh.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq tramp-default-method "ssh"
+      tramp-backup-directory-alist backup-directory-alist
+      tramp-ssh-controlmaster-options "ssh")
+
+#+END_SRC
+
+** Move correctly over camelCased words
+subword-mode is a built-in mode that helps moving over camelCase words correctly.
+
+#+BEGIN_SRC emacs-lisp
+
+(subword-mode)
+
+#+END_SRC
+
+** Understand the more common sentence
+By default, Emacs thinks a sentence is a full-stop followed by 2 spaces. Let’s make it full-stop and 1 space.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq sentence-end-double-space nil)
+
+#+END_SRC
+
+** Recenter screen
+Emacs lets you move the current line to the top, middle or bottom of the screen to get appropriate context. The default goes to the middle first. I prefer that the default goes to the top first. Let’s change this.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq recenter-positions '(top middle bottom))
+
+#+END_SRC
+
+** Better wild cards in search
+The built-in incremental search is pretty good but the most common regex I type is .* which stands for anything. This makes sure space between words acts the same way. It’s much better for me to use it now.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq search-whitespace-regexp ".*?")
+
+#+END_SRC
+
+** Persistent history
+I prefer to have some persistent history for some prompts.
+
+#+BEGIN_SRC emacs-lisp
+
+(savehist-mode)
+
+#+END_SRC
+
+** Narrow to region
+This is such a an amazing feature but is disabled by default. Let’s re-enable it. For further reference on narrow region, refer to the Emacs manual.
+
+#+BEGIN_SRC emacs-lisp
+
+(put 'narrow-to-region 'disabled nil)
+
+#+END_SRC
+
+* PDF files
+Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and note taking extensively, I actually prefer reading PDFs in Emacs. Not to mention, this is one of the few PDF readers that lets me view the PDF in split-views which is immensely useful while reading research papers.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq doc-view-continuous t)
+
+#+END_SRC
+
+* Window management
+Winner mode is an Emacs built-in package that lets you undo and redo window configurations. Incredibly useful since I keep splitting and merging windows all the time. Let’s enable it.
+
+#+BEGIN_SRC emacs-lisp
+
+(when (fboundp 'winner-mode)
+  (winner-mode 1))
+
+#+END_SRC
+
+* Recent files
+An Emacs “mode” is a collection of behavior. It has both major and minor modes. One such useful mode is the recentf-mode, which stands for recent files mode. Let’s give configure some options and enable it.
+
+#+BEGIN_SRC emacs-lisp
+
+;; Recentf mode changes
+(setq recentf-max-saved-items 1000
+      recentf-exclude '("/tmp/" "/ssh:"))
+(recentf-mode)
+
+#+END_SRC
+
+* Fonts
+Switching font is something I do quite often. Also, zooming in text isn’t the same as just increasing the font size. So, these are some convenience functions taken from Jay Dixit’s emacs configuration and Oleh Krehel’s configuration.
+
+#+BEGIN_SRC emacs-lisp
+
+(cond ((eq system-type 'gnu/linux)
+       (set-frame-font "DejaVu Sans Mono"))
+      ((eq system-type 'darwin)
+       (set-frame-font "Monaco"))
+      ((eq system-type 'windows-nt)
+       (set-frame-font "Lucida Sans Typewriter")))
+;;; Some convenience font functions
+(defun sk/courier-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "Courier")
+    (set-frame-width (selected-frame) 97))
+(defun sk/georgia-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "Georgia" :height 160))
+(defun sk/hack-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "Hack"))
+(defun sk/monaco-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "Monaco"))
+(defun sk/consolas-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "Consolas"))
+(defun sk/deja-vu-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "DejaVu Sans Mono"))
+
+;; Font types
+(defun sk/tiny-type ()
+  (interactive)
+  (set-face-attribute 'default nil  :height 150))
+(defun sk/miniscule-type ()
+  (interactive)
+  (set-face-attribute 'default nil  :height 140))
+(defun sk/small-type ()
+  (interactive)
+  (set-face-attribute 'default nil  :height 190)
+  (set-frame-width (selected-frame) 89))
+(defun sk/medium-type ()
+  (interactive)
+  (set-face-attribute 'default nil  :height 215)
+  (set-frame-width (selected-frame) 89))
+(defun sk/large-type ()
+  (interactive)
+  (set-face-attribute 'default nil  :height 350)
+  (set-frame-width (selected-frame) 68))
+
+#+END_SRC
+
+* Use package macro
+use-package is a macro that helps in downloading and managing package a breeze. It has lots of options for lazy loading and configurations and this configuration relies on it completely for all package management. This is a requirement. The following piece of code checks if it is already installed and installs it if it is not and also loads it and bind-key. I should extend this to add key words for :modalka and :which-key.
+
+#+BEGIN_SRC emacs-lisp
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(eval-when-compile
+  (require 'use-package))
+(require 'bind-key)                ;; if you use any :bind variant
+
+#+END_SRC
+
+* Diminish minor modes from the mode line
+Now that we have made sure we have installed use-package, we will make sure another nice package to change the mode-line minor mode list. For this, we can use use-package itself and also go ahead and diminish some built-in minor modes.
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package diminish
+  :ensure t
+  :demand t
+  :diminish (visual-line-mode . "ω")
+  :diminish hs-minor-mode
+  :diminish abbrev-mode
+  :diminish auto-fill-function
+  :diminish subword-mode)
+
+#+END_SRC
+
+However, some built-in minor modes are notorious and don’t seem to work with the above method. Let’s diminish them using functions one by one.
+
+** Diminish org-indent mode
+I like to enable the org-indent mode for a clean view in Org mode and this doesn’t seem to get diminish the usual way. We define a function and a add a hook to achieve this.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun sk/diminish-org-indent ()
+  (interactive)
+  (diminish 'org-indent-mode ""))
+(add-hook 'org-indent-mode-hook 'sk/diminish-org-indent)
+
+#+END_SRC
+
+** Diminish auto-revert mode
+auto-revert mode is useful when Emacs auto-saves your file and you want to load the backup.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun sk/diminish-auto-revert ()
+  (interactive)
+  (diminish 'auto-revert-mode ""))
+(add-hook 'auto-revert-mode-hook 'sk/diminish-auto-revert)
+
+#+END_SRC
+
+** Diminish eldoc mode
+Eldoc mode is a mode to display documentation for languages in Emacs
+
+#+BEGIN_SRC emacs-lisp
+
+(defun sk/diminish-eldoc ()
+  (interactive)
+  (diminish 'eldoc-mode ""))
+(add-hook 'eldoc-mode-hook 'sk/diminish-eldoc)
+
+#+END_SRC
+
+** Diminish subword mode
+subword-mode is described here.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun sk/diminish-subword ()
+  (interactive)
+  (diminish 'subword-mode ""))
+(add-hook 'subword-mode-hook 'sk/diminish-subword)
+
+#+END_SRC
+
+
+* Manage the built-in flyspell mode
+Flyspell mode is a built-in mode for prose spell-checking. It sometimes slows down Emacs. It also has flyspell-prog-mode which checks for spelling in programming comments.
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package flyspell
+  :diminish (flyspell-mode . "φ")
+  :bind* (("M-m ] s" . flyspell-goto-next-error)))
+#+END_SRC
+
+* Manage the built-in browser eww
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package eww
+  :bind* (("M-m g x" . eww)
+          ("M-m g :" . eww-browse-with-external-browser)
+          ("M-m g #" . eww-list-histories)
+          ("M-m g {" . eww-back-url)
+          ("M-m g }" . eww-forward-url))
+  :config
+  (progn
+    (add-hook 'eww-mode-hook 'visual-line-mode)))
+#+END_SRC
+
+* Add a package to set the correct path
+Sometimes when opening the Mac Emacs.app via GUI, by clicking the button, it doesn’t load all the proper utilities from the OS. This package fixes that.
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package exec-path-from-shell
+  :ensure t
+  :demand t
+  :init
+  (setq exec-path-from-shell-check-startup-files nil)
+  :config
+  ;; (exec-path-from-shell-copy-env "PYTHONPATH")
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+#+END_SRC
+
+* Add some useful libraries
+async, s, dash, and cl-lib are libraries for asynchronous processing, string manipulation, list manipulation and backward compatibility respectively.
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package async
+  :ensure t
+  :commands (async-start))
+
+(use-package cl-lib
+  :ensure t)
+
+(use-package dash
+  :ensure t)
+
+(use-package s
+  :ensure t)
+
+#+END_SRC
+
+* Restart emacs from emacs
+The heading says it all. I find it useful
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package restart-emacs
+  :ensure t
+  :bind* (("C-x M-c" . restart-emacs)))
+#+END_SRC
+
+
+* Bind key to bind some unbound defaults
+There are some pretty nice default functions that are unbound. I use the bind-key package that comes along with use-package to bind these keys. I hijack the M-m (which can be command + m or alt + m depending on how you configure it) prefix. I find the default action bound to M-m - going to the first non-whitespace character in line - pretty useless as our smarter start of line already takes care of this for us.
+
+#+BEGIN_SRC emacs-lisp
+
+(bind-keys*
+  ("C-r"       . dabbrev-expand)
+  ("M-/"       . hippie-expand)
+  ("C-S-d"     . kill-whole-line)
+  ("M-m SPC c" . load-theme)
+  ("M-m SPC R" . locate)
+  ("M-m W"     . winner-undo)
+  ("M-m g m"   . make-frame)
+  ("M-m g M"   . delete-frame)
+  ("M-m g n"   . select-frame-by-name)
+  ("M-m g N"   . set-frame-name)
+  ("M-m B"     . mode-line-other-buffer)
+  ("M-m ="     . indent-region)
+  ("M-m g ("   . Info-prev)
+  ("M-m g )"   . Info-next)
+  ("M-m ^"     . Info-up)
+  ("M-m &"     . Info-goto-node)
+  ("M-m g f"   . find-file-at-point)
+  ("M-m g u"   . downcase-region)
+  ("M-m g U"   . upcase-region)
+  ("M-m g C"   . capitalize-region)
+  ("M-m g F"   . follow-mode)
+  ("M-m R"     . overwrite-mode)
+  ("M-m g j"   . doc-view-next-page)
+  ("M-m g k"   . doc-view-previous-page)
+  ("M-m : t"   . emacs-init-time)
+  ("M-m g q"   . fill-paragraph)
+  ("M-m g @"   . compose-mail)
+  ("M-m SPC ?" . describe-bindings))
+#+END_SRC
+* Tangle on save
+This was taken from Alan Pearce’s dotfiles so as to tangle it on save instead of tangling it every time I open it again.
+
+#+BEGIN_SRC emacs-lisp
+
+(defun tangle-if-init ()
+  "If the current buffer is 'init.org' the code-blocks are
+    tangled, and the tangled file is compiled."
+
+  (when (string-suffix-p "config.org" (buffer-file-name))
+    (tangle-init)))
+
+(defun tangle-init-sync ()
+  (interactive)
+  (message "Tangling init")
+  ;; Avoid running hooks when tangling.
+  (let ((prog-mode-hook nil)
+        (src  (expand-file-name "config.org" user-emacs-directory))
+        (dest (expand-file-name "config.el"  user-emacs-directory)))
+    (require 'ob-tangle)
+    (org-babel-tangle-file src dest)
+    (if (byte-compile-file dest)
+        (byte-compile-dest-file dest)
+      (with-current-buffer byte-compile-log-buffer
+        (buffer-string)))))
+
+(defun tangle-init ()
+  "Tangle init.org asynchronously."
+
+  (interactive)
+  (message "Tangling init")
+  (async-start
+   (symbol-function #'tangle-init-sync)
+   (lambda (result)
+     (message "Init tangling completed: %s" result))))
+#+END_SRC
+
+
+
+
+
+* Some other shit
+#+BEGIN_SRC emacs-lisp
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+
+
+;; (tool-bar-mode -1)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default bold shadow italic underline bold bold-italic bold])
+ '(ansi-color-names-vector
+   (vector "#cccccc" "#f2777a" "#99cc99" "#ffcc66" "#6699cc" "#cc99cc" "#66cccc" "#2d2d2d"))
+ '(custom-safe-themes
+   (quote
+    ("bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" default)))
+ '(fci-rule-color "#393939")
+ '(package-selected-packages (quote (color-theme-sanityinc-tomorrow)))
+ '(vc-annotate-background nil)
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#f2777a")
+     (40 . "#f99157")
+     (60 . "#ffcc66")
+     (80 . "#99cc99")
+     (100 . "#66cccc")
+     (120 . "#6699cc")
+     (140 . "#cc99cc")
+     (160 . "#f2777a")
+     (180 . "#f99157")
+     (200 . "#ffcc66")
+     (220 . "#99cc99")
+     (240 . "#66cccc")
+     (260 . "#6699cc")
+     (280 . "#cc99cc")
+     (300 . "#f2777a")
+     (320 . "#f99157")
+     (340 . "#ffcc66")
+     (360 . "#99cc99"))))
+ '(vc-annotate-very-old-color nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+(require 'color-theme-sanityinc-tomorrow)
+;;(require 'helm-config)
+(load-theme 'sanityinc-tomorrow-night)
+
+#+END_SRC
+
+Just to test this is my config for the moment
+
+#+BEGIN_SRC emacs-lisp :tangle no
+
+(message "I don't exist!")
+
+#+END_SRC
+
+* References
+[[https://github.com/andschwa/.emacs.d.git][Andrew Schwartzmeyer]]
+[[https://github.com/sriramkswamy/dotemacs.git][Sriram Krishnaswamy]]
