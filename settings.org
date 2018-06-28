@@ -616,6 +616,19 @@ Just to test this is my config for the moment
 
 #+END_SRC
 
+* Markdown
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
+
+#+END_SRC
 * References
 
 1. [[https://github.com/andschwa/.emacs.d.git][Andrew Schwartzmeyer]]
