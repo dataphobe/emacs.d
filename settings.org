@@ -127,7 +127,7 @@ UTF-8 works for most of the files I tend to use
 (global-linum-mode t)
 #+END_SRC
 
-** Large file warning
+** Large File Warning
 
 #+BEGIN_SRC emacs-lisp
 
@@ -135,8 +135,8 @@ UTF-8 works for most of the files I tend to use
 
 #+END_SRC
 
-** Lazier prompting
-
+** Lazier Prompting
+Change yes-or-no questions into y-or-n questions
 #+BEGIN_SRC emacs-lisp
 
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -378,8 +378,7 @@ UTF-8 works for most of the files I tend to use
 
 
 
-
-* Window management
+** Window management
 
 #+BEGIN_SRC emacs-lisp
 
@@ -388,6 +387,15 @@ UTF-8 works for most of the files I tend to use
 
 #+END_SRC
 
+* Async
+Lets us use asynchronous processes wherever possible, pretty useful.
+
+#+BEGIN_SRC emacs-lisp
+(use-package async
+  :ensure t
+  :init (dired-async-mode 1))
+
+#+END_SRC
 * Recent files
 
 #+BEGIN_SRC emacs-lisp
@@ -399,7 +407,27 @@ UTF-8 works for most of the files I tend to use
 
 #+END_SRC
 
-* PDF files
+
+
+
+* File manager
+ Sunrise Commander! I’m not changing much, just disabling the mouse and adding buttons.
+
+#+BEGIN_SRC emacs-lisp
+(use-package sunrise-commander
+  :ensure t
+  :init
+    (use-package sunrise-x-buttons :ensure t)
+    (use-package sunrise-x-modeline :ensure t)
+    (setq sr-cursor-follows-mouse 1)
+    (define-key sr-mode-map [mouse-1] 1)
+    (define-key sr-mode-map [mouse-movement] 1)
+  :bind ("s-t" . sunrise))
+
+#+END_SRC
+
+* Reading and Writing
+** PDF files
 Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and note taking extensively, I actually prefer reading PDFs in Emacs. Not to mention, this is one of the few PDF readers that lets me view the PDF in split-views which is immensely useful while reading research papers.
 
 #+BEGIN_SRC emacs-lisp
@@ -408,22 +436,22 @@ Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and
 
 #+END_SRC
 
-* Use package macro
+** Markdown
 
 #+BEGIN_SRC emacs-lisp
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(eval-when-compile
-  (require 'use-package))
-(require 'bind-key)                ;; if you use any :bind variant
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
 
 #+END_SRC
 
 
-
-* Spell
+** Spell
 
 #+BEGIN_SRC emacs-lisp
 
@@ -431,6 +459,7 @@ Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and
   :diminish (flyspell-mode . "φ")
   :bind* (("M-m ] s" . flyspell-goto-next-error)))
 #+END_SRC
+
 
 * Manage the built-in browser eww
 
@@ -446,22 +475,6 @@ Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and
   (progn
     (add-hook 'eww-mode-hook 'visual-line-mode)))
 #+END_SRC
-
-* Add a package to set the correct path
-
-#+BEGIN_SRC emacs-lisp
-
-(use-package exec-path-from-shell
-  :ensure t
-  :demand t
-  :init
-  (setq exec-path-from-shell-check-startup-files nil)
-  :config
-  ;; (exec-path-from-shell-copy-env "PYTHONPATH")
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize)))
-#+END_SRC
-
 
 
 * Restart emacs from emacs
@@ -512,20 +525,6 @@ Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and
 #+END_SRC
 
 
-
-* Markdown
-
-#+BEGIN_SRC emacs-lisp
-
-(use-package markdown-mode
-  :ensure t
-  :commands (markdown-mode gfm-mode)
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "multimarkdown"))
-
-#+END_SRC
 
 
 * Programming
