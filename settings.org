@@ -410,22 +410,333 @@ Lets us use asynchronous processes wherever possible, pretty useful.
 
 
 
-* File manager
- Sunrise Commander! I’m not changing much, just disabling the mouse and adding buttons.
 
+
+
+* Moving around emacs
+One of the most important things about a text editor is how efficient you manage
+to be when using it, how much time do basic tasks take you and so on and so forth.
+One of those tasks is moving around files and buffers, whatever you may use emacs for
+you /will/ be jumping around buffers like it's serious business, the following
+set of enhancements aims to make it easier.
+
+As a great emacs user once said:
+
+#+BEGIN_QUOTE
+Do me the favor, do me the biggest favor, matter of fact do yourself the biggest favor and integrate those into your workflow.
+#+END_QUOTE
+
+** a prerequisite for others packages
 #+BEGIN_SRC emacs-lisp
-(use-package sunrise-commander
-  :ensure t
-  :init
-    (use-package sunrise-x-buttons :ensure t)
-    (use-package sunrise-x-modeline :ensure t)
-    (setq sr-cursor-follows-mouse 1)
-    (define-key sr-mode-map [mouse-1] 1)
-    (define-key sr-mode-map [mouse-movement] 1)
-  :bind ("s-t" . sunrise))
-
+  (use-package ivy
+    :ensure t)
 #+END_SRC
 
+** scrolling and why does the screen move
+I don't know to be honest, but this little bit of code makes scrolling with emacs a lot nicer.
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-conservatively 100)
+#+END_SRC
+
+** which-key and why I love emacs
+In order to use emacs, you don't need to know how to use emacs.
+It's self documenting, and coupled with this insanely useful package, it's even easier.
+In short, after you start the input of a command and stop, pondering what key must follow,
+it will automatically open a non-intrusive buffer at the bottom of the screen offering
+you suggestions for completing the command, that's it, nothing else.
+
+It's beautiful
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :config
+      (which-key-mode))
+#+END_SRC
+
+
+** swiper and why is the default search so lame
+I like me some searching, the default search is very meh. In emacs, you mostly use search to get around your buffer, much like with avy, but sometimes it doesn't hurt to search for entire words or mode, swiper makes sure this is more efficient.
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :ensure t
+    :bind ("C-s" . 'swiper))
+#+END_SRC
+
+** buffers and why I hate list-buffers
+Another big thing is, buffers. If you use emacs, you use buffers, everyone loves them.
+Having many buffers is useful, but can be tedious to work with, let us see how we can improve it.
+
+*** Always murder current buffer
+Doing =C-x k= should kill the current buffer at all times, we have =ibuffer= for more sophisticated thing.
+#+BEGIN_SRC emacs-lisp
+  (defun kill-current-buffer ()
+    "Kills the current buffer."
+    (interactive)
+    (kill-buffer (current-buffer)))
+  (global-set-key (kbd "C-x k") 'kill-current-buffer)
+#+END_SRC
+
+
+
+
+*** close-all-buffers
+It's one of those things where I genuinely have to wonder why there is no built in functionality for it.
+Once in a blue moon I need to kill all buffers, and having ~150 of them open would mean I'd need to spend a few too many
+seconds doing this than I'd like, here's a solution.
+
+This can be invoked using =C-M-s-k=. This keybinding makes sure you don't hit it unless you really want to.
+#+BEGIN_SRC emacs-lisp
+  (defun close-all-buffers ()
+    "Kill all buffers without regard for their origin."
+    (interactive)
+    (mapc 'kill-buffer (buffer-list)))
+  (global-set-key (kbd "C-M-s-k") 'close-all-buffers)
+#+END_SRC
+
+** ido and why I started using helm
+Sometimes, you don't realize how good something is until you try it extensively.
+I give in, helm is awesome. I'll end up customizing it more eventually,
+it's rather similar to ido-vertical though.
+*** helm
+#+BEGIN_SRC emacs-lisp
+  (use-package helm
+    :ensure t
+    :bind
+    ("C-x C-f" . 'helm-find-files)
+    ("C-x C-b" . 'helm-buffers-list)
+    ("M-x" . 'helm-M-x)
+    :config
+    (defun daedreth/helm-hide-minibuffer ()
+      (when (with-helm-buffer helm-echo-input-in-header-line)
+        (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
+          (overlay-put ov 'window (selected-window))
+          (overlay-put ov 'face
+                       (let ((bg-color (face-background 'default nil)))
+                         `(:background ,bg-color :foreground ,bg-color)))
+          (setq-local cursor-type nil))))
+    (add-hook 'helm-minibuffer-set-up-hook 'daedreth/helm-hide-minibuffer)
+    (setq helm-autoresize-max-height 0
+          helm-autoresize-min-height 40
+          helm-M-x-fuzzy-match t
+          helm-buffers-fuzzy-matching t
+          helm-recentf-fuzzy-match t
+          helm-semantic-fuzzy-match t
+          helm-imenu-fuzzy-match t
+          helm-split-window-in-side-p nil
+          helm-move-to-line-cycle-in-source nil
+          helm-ff-search-library-in-sexp t
+          helm-scroll-amount 8 
+          helm-echo-input-in-header-line t)
+    :init
+    (helm-mode 1))
+
+  (require 'helm-config)    
+  (helm-autoresize-mode 1)
+  (define-key helm-find-files-map (kbd "C-b") 'helm-find-files-up-one-level)
+  (define-key helm-find-files-map (kbd "C-f") 'helm-execute-persistent-action)
+#+END_SRC
+
+** avy and why it's the best thing in existence
+Many times have I pondered how I can move around buffers even quicker.
+I'm glad to say, that avy is precisely what I needed, and it's precisely what you need as well.
+In short, as you invoke one of avy's functions, you will be prompted for a character
+that you'd like to jump to in the /visible portion of the current buffer/.
+Afterwards you will notice how all instances of said character have additional letter on top of them.
+Pressing those letters, that are next to your desired character will move your cursor over there.
+Admittedly, this sounds overly complicated and complex, but in reality takes a split second
+and improves your life tremendously.
+
+I like =M-s= for it, same as =C-s= is for moving by searching string, now =M-s= is moving by searching characters.
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :bind
+      ("M-s" . avy-goto-char))
+#+END_SRC
+
+* Text manipulation
+Here I shall collect self-made functions that make editing text easier.
+
+** Mark-Multiple
+I can barely contain my joy. This extension allows you to quickly mark the next occurence of a region and edit them all at once. Wow!
+#+BEGIN_SRC emacs-lisp
+  (use-package mark-multiple
+    :ensure t
+    :bind ("C-c q" . 'mark-next-like-this))
+#+END_SRC
+
+** Improved kill-word
+Why on earth does a function called =kill-word= not .. kill a word.
+It instead deletes characters from your cursors position to the end of the word,
+let's make a quick fix and bind it properly.
+#+BEGIN_SRC emacs-lisp
+  (defun daedreth/kill-inner-word ()
+    "Kills the entire word your cursor is in. Equivalent to 'ciw' in vim."
+    (interactive)
+    (forward-char 1)
+    (backward-word)
+    (kill-word 1))
+  (global-set-key (kbd "C-c w k") 'daedreth/kill-inner-word)
+#+END_SRC
+
+** Improved copy-word
+And again, the same as above but we make sure to not delete the source word.
+#+BEGIN_SRC emacs-lisp
+  (defun daedreth/copy-whole-word ()
+    (interactive)
+    (save-excursion
+      (forward-char 1)
+      (backward-word)
+      (kill-word 1)
+      (yank)))
+  (global-set-key (kbd "C-c w c") 'daedreth/copy-whole-word)
+#+END_SRC
+
+** Copy a line
+Regardless of where your cursor is, this quickly copies a line.
+#+BEGIN_SRC emacs-lisp
+  (defun daedreth/copy-whole-line ()
+    "Copies a line without regard for cursor position."
+    (interactive)
+    (save-excursion
+      (kill-new
+       (buffer-substring
+        (point-at-bol)
+        (point-at-eol)))))
+  (global-set-key (kbd "C-c l c") 'daedreth/copy-whole-line)
+#+END_SRC
+
+** Kill a line
+And this quickly deletes a line.
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c l k") 'kill-whole-line)
+#+END_SRC
+
+* Minor conveniences
+Emacs is at it's best when it just does things for you, shows you the way, guides you so to speak.
+This can be best achieved using a number of small extensions. While on their own they might not be particularly
+impressive. Together they create a nice environment for you to work in.
+
+** Visiting the configuration
+Quickly edit =~/.emacs.d/config.org=
+#+BEGIN_SRC emacs-lisp
+  (defun config-visit ()
+    (interactive)
+    (find-file "~/.emacs.d/config.org"))
+  (global-set-key (kbd "C-c e") 'config-visit)
+#+END_SRC
+
+** Reloading the configuration
+   
+Simply pressing =Control-c r= will reload this file, very handy.
+You can also manually invoke =config-reload=.
+#+BEGIN_SRC emacs-lisp
+  (defun config-reload ()
+    "Reloads ~/.emacs.d/config.org at runtime"
+    (interactive)
+    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+  (global-set-key (kbd "C-c r") 'config-reload)
+#+END_SRC
+
+** Subwords
+Emacs treats camelCase strings as a single word by default, this changes said behaviour.
+#+BEGIN_SRC emacs-lisp
+  (global-subword-mode 1)
+#+END_SRC
+
+** Electric
+If you write any code, you may enjoy this.
+Typing the first character in a set of 2, completes the second one after your cursor.
+Opening a bracket? It's closed for you already. Quoting something? It's closed for you already.
+
+You can easily add and remove pairs yourself, have a look.
+#+BEGIN_SRC emacs-lisp
+(setq electric-pair-pairs '(
+                           (?\{ . ?\})
+                           (?\( . ?\))
+                           (?\[ . ?\])
+                           (?\" . ?\")
+                           ))
+#+END_SRC
+
+And now to enable it
+#+BEGIN_SRC emacs-lisp
+(electric-pair-mode t)
+#+END_SRC
+
+** Beacon
+While changing buffers or workspaces, the first thing you do is look for your cursor.
+Unless you know its position, you can not move it efficiently. Every time you change
+buffers, the current position of your cursor will be briefly highlighted now.
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon
+    :ensure t
+    :config
+      (beacon-mode 1))
+#+END_SRC
+
+** Rainbow
+Mostly useful if you are into web development or game development.
+Every time emacs encounters a hexadecimal code that resembles a color, it will automatically highlight
+it in the appropriate color. This is a lot cooler than you may think.
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :ensure t
+    :init
+      (add-hook 'prog-mode-hook 'rainbow-mode))
+#+END_SRC
+
+** Show parens
+I forgot about that initially, it highlights matching parens when the cursor is just behind one of them.
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode 1)
+#+END_SRC
+** Rainbow delimiters
+Colors parentheses and other delimiters depending on their depth, useful for any language using them,
+especially lisp.
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :init
+      (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+#+END_SRC
+
+** Expand region
+A pretty simple package, takes your cursor and semantically expands the region, so words, sentences, maybe the contents of some parentheses, it's awesome, try it out.
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :bind ("C-q" . er/expand-region))
+#+END_SRC
+
+** Zapping to char
+A nifty little package that kills all text between your cursor and a selected character.
+A lot more useful than you might think. If you wish to include the selected character in the killed region,
+change =zzz-up-to-char= into =zzz-to-char=.
+#+BEGIN_SRC emacs-lisp
+  (use-package zzz-to-char
+    :ensure t
+    :bind ("M-z" . zzz-up-to-char))
+#+END_SRC
+
+* Kill ring
+There is a lot of customization to the kill ring, and while I have not used it much before,
+I decided that it was time to change that.
+** Maximum entries on the ring
+The default is 60, I personally need more sometimes.
+#+BEGIN_SRC emacs-lisp
+  (setq kill-ring-max 100)
+#+END_SRC
+
+** popup-kill-ring
+Out of all the packages I tried out, this one, being the simplest, appealed to me most.
+With a simple M-y you can now browse your kill-ring like browsing autocompletion items.
+C-n and C-p totally work for this.
+#+BEGIN_SRC emacs-lisp
+  (use-package popup-kill-ring
+    :ensure t
+    :bind ("M-y" . popup-kill-ring))
+#+END_SRC
 * Reading and Writing
 ** PDF files
 Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and note taking extensively, I actually prefer reading PDFs in Emacs. Not to mention, this is one of the few PDF readers that lets me view the PDF in split-views which is immensely useful while reading research papers.
@@ -460,6 +771,101 @@ Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and
   :bind* (("M-m ] s" . flyspell-goto-next-error)))
 #+END_SRC
 
+* Org
+One of the absolute greatest features of emacs is called "org-mode".
+This very file has been written in org-mode, a lot of other configurations are written in org-mode, same goes for
+academic papers, presentations, schedules, blogposts and guides.
+Org-mode is one of the most complex things ever, lets make it a bit more usable with some basic configuration.
+
+
+Those are all rather self-explanatory.
+
+** Common settings
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-ellipsis " ")
+  (setq org-src-fontify-natively t)
+  (setq org-src-tab-acts-natively t)
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-export-with-smart-quotes t)
+  (setq org-src-window-setup 'current-window)
+  (add-hook 'org-mode-hook 'org-indent-mode)
+#+END_SRC
+
+** Syntax highlighting for documents exported to HTML
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize
+    :ensure t)
+#+END_SRC
+
+** Line wrapping
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook
+	    '(lambda ()
+	       (visual-line-mode 1)))
+#+END_SRC
+
+** Keybindings
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c '") 'org-edit-src-code)
+#+END_SRC
+
+** Org Bullets
+Makes it all look a bit nicer, I hate looking at asterisks.
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :config
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+#+END_SRC
+
+** Easy-to-add emacs-lisp template
+Hitting tab after an "<el" in an org-mode file will create a template for elisp insertion.
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-structure-template-alist
+	       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+#+END_SRC
+
+** Exporting options
+One of the best things about org is the ability to export your file to many formats.
+Here is how we add more of them!
+
+*** latex
+#+BEGIN_SRC emacs-lisp
+  (when (file-directory-p "/usr/share/emacs/site-lisp/tex-utils")
+    (add-to-list 'load-path "/usr/share/emacs/site-lisp/tex-utils")
+    (require 'xdvi-search))
+#+END_SRC
+*** Twitter Bootstrap
+#+BEGIN_SRC emacs-lisp
+  (use-package ox-twbs
+    :ensure t)
+#+END_SRC
+
+* Diminishing modes
+Your modeline is sacred, and if you have a lot of modes enabled, as you will if you use this config,
+you might end up with a lot of clutter there, the package =diminish= disables modes on the mode line but keeps
+them running, it just prevents them from showing up and taking up space.
+
+*THIS WILL BE REMOVED SOON AS USE-PACKAGE HAS THE FUNCTIONALITY BUILT IN*
+
+Edit this list as you see fit!
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t
+    :init
+    (diminish 'which-key-mode)
+    (diminish 'linum-relative-mode)
+    (diminish 'hungry-delete-mode)
+    (diminish 'visual-line-mode)
+    (diminish 'subword-mode)
+    (diminish 'beacon-mode)
+    (diminish 'irony-mode)
+    (diminish 'page-break-lines-mode)
+    (diminish 'auto-revert-mode)
+    (diminish 'rainbow-delimiters-mode)
+    (diminish 'rainbow-mode))
+#+END_SRC
 
 * Manage the built-in browser eww
 
