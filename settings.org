@@ -618,11 +618,11 @@ This can be best achieved using a number of small extensions. While on their own
 impressive. Together they create a nice environment for you to work in.
 
 ** Visiting the configuration
-Quickly edit =~/.emacs.d/config.org=
+Quickly edit =~/.emacs.d/settings.org=
 #+BEGIN_SRC emacs-lisp
   (defun config-visit ()
     (interactive)
-    (find-file "~/.emacs.d/config.org"))
+    (find-file "~/.emacs.d/settings.org"))
   (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
 
@@ -632,9 +632,9 @@ Simply pressing =Control-c r= will reload this file, very handy.
 You can also manually invoke =config-reload=.
 #+BEGIN_SRC emacs-lisp
   (defun config-reload ()
-    "Reloads ~/.emacs.d/config.org at runtime"
+    "Reloads ~/.emacs.d/settings.org at runtime"
     (interactive)
-    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+    (org-babel-load-file (expand-file-name "~/.emacs.d/settings.org")))
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
 
@@ -949,6 +949,17 @@ Edit this list as you see fit!
 
 (setq ediff-window-setup-function 'ediff-setup-windows-plain
       ediff-split-window-function 'split-window-horizontally)
+#+END_SRC
+
+
+** IPython
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package ein
+    :ensure t)
+
+
 #+END_SRC
 
 
