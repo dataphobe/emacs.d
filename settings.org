@@ -1,30 +1,14 @@
-* Basic
-
-** Profiling
-
-
-
-#+BEGIN_SRC emacs-lisp :tangle no
-
-(require 'package)
-(package-initialize)
-
-#+END_SRC
-
-
 * Defaults
 
 ** Personal Information
-
+My personal information.
 #+BEGIN_SRC emacs-lisp
 
 (setq user-full-name "Dataphobe")
 
 #+END_SRC
 
-* Custom file
-
-
+Provent emacs from writing messing up the init.el when I use the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Easy-Customization.html][customization interface]].
 
 #+BEGIN_SRC emacs-lisp
 
@@ -34,7 +18,7 @@
 
 #+END_SRC
 
-* Startup
+* Appearance
 
 ** Disabling some GUI elements
 
@@ -43,9 +27,10 @@
 #+BEGIN_SRC emacs-lisp
 
 (when window-system
-  (tool-bar-mode 0)
-  (scroll-bar-mode 0)
-  (tooltip-mode 0))
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (menu-bar-mode -1)
+  (tooltip-mode -1))
 
 #+END_SRC
 
@@ -67,9 +52,7 @@
 
 #+END_SRC
 
-** Initial screen
-
-
+** Initial Message
 
 
 #+BEGIN_SRC emacs-lisp
@@ -79,16 +62,6 @@
       initial-scratch-message ""
       initial-major-mode 'fundamental-mode
       inhibit-splash-screen t)
-
-
-#+END_SRC
-
-
-** Startup echo message
-
-
-
-#+BEGIN_SRC emacs-lisp
 
 ;; Change the echo message
 (defun display-startup-echo-area-message ()
@@ -123,17 +96,20 @@
 #+END_SRC
 
 
-** File encoding system
+** Encoding System
 UTF-8 works for most of the files I tend to use
 
 #+BEGIN_SRC emacs-lisp
-
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
 (setq-default buffer-file-coding-system 'utf-8-auto-unix)
 
 #+END_SRC
 
-** Error message
+** Error Bell
 
 #+BEGIN_SRC emacs-lisp
 
@@ -177,22 +153,7 @@ UTF-8 works for most of the files I tend to use
 
 #+END_SRC
 
-** gdb
 
-#+BEGIN_SRC emacs-lisp
-
-(setq gdb-many-windows t
-      gdb-show-main t)
-
-#+END_SRC
-
-** ediff
-
-#+BEGIN_SRC emacs-lisp
-
-(setq ediff-window-setup-function 'ediff-setup-windows-plain
-      ediff-split-window-function 'split-window-horizontally)
-#+END_SRC
 
 ** tramp
 
@@ -252,320 +213,7 @@ UTF-8 works for most of the files I tend to use
 
 #+END_SRC
 
-* PDF files
-Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and note taking extensively, I actually prefer reading PDFs in Emacs. Not to mention, this is one of the few PDF readers that lets me view the PDF in split-views which is immensely useful while reading research papers.
-
-#+BEGIN_SRC emacs-lisp
-
-(setq doc-view-continuous t)
-
-#+END_SRC
-
-* Window management
-
-#+BEGIN_SRC emacs-lisp
-
-(when (fboundp 'winner-mode)
-  (winner-mode 1))
-
-#+END_SRC
-
-* Recent files
-
-#+BEGIN_SRC emacs-lisp
-
-;; Recentf mode changes
-(setq recentf-max-saved-items 1000
-      recentf-exclude '("/tmp/" "/ssh:"))
-(recentf-mode)
-
-#+END_SRC
-
-* Fonts
-
-#+BEGIN_SRC emacs-lisp
-
-(cond ((eq system-type 'gnu/linux)
-       (set-frame-font "DejaVu Sans Mono"))
-      ((eq system-type 'darwin)
-       (set-frame-font "Monaco"))
-      ((eq system-type 'windows-nt)
-       (set-frame-font "Lucida Sans Typewriter")))
-;;; Some convenience font functions
-(defun sk/courier-font ()
-  (interactive)
-  (set-face-attribute 'default nil :font "Courier")
-    (set-frame-width (selected-frame) 97))
-(defun sk/georgia-font ()
-  (interactive)
-  (set-face-attribute 'default nil :font "Georgia" :height 160))
-(defun sk/hack-font ()
-  (interactive)
-  (set-face-attribute 'default nil :font "Hack"))
-(defun sk/monaco-font ()
-  (interactive)
-  (set-face-attribute 'default nil :font "Monaco"))
-(defun sk/consolas-font ()
-  (interactive)
-  (set-face-attribute 'default nil :font "Consolas"))
-(defun sk/deja-vu-font ()
-  (interactive)
-  (set-face-attribute 'default nil :font "DejaVu Sans Mono"))
-
-;; Font types
-(defun sk/tiny-type ()
-  (interactive)
-  (set-face-attribute 'default nil  :height 150))
-(defun sk/miniscule-type ()
-  (interactive)
-  (set-face-attribute 'default nil  :height 140))
-(defun sk/small-type ()
-  (interactive)
-  (set-face-attribute 'default nil  :height 190)
-  (set-frame-width (selected-frame) 89))
-(defun sk/medium-type ()
-  (interactive)
-  (set-face-attribute 'default nil  :height 215)
-  (set-frame-width (selected-frame) 89))
-(defun sk/large-type ()
-  (interactive)
-  (set-face-attribute 'default nil  :height 350)
-  (set-frame-width (selected-frame) 68))
-
-#+END_SRC
-
-* Use package macro
-
-#+BEGIN_SRC emacs-lisp
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(eval-when-compile
-  (require 'use-package))
-(require 'bind-key)                ;; if you use any :bind variant
-
-#+END_SRC
-
-* Diminish minor modes from the mode line
-
-#+BEGIN_SRC emacs-lisp
-
-(use-package diminish
-  :ensure t
-  :demand t
-  :diminish (visual-line-mode . "ω")
-  :diminish hs-minor-mode
-  :diminish abbrev-mode
-  :diminish auto-fill-function
-  :diminish subword-mode)
-
-#+END_SRC
-
-
-** Diminish org-indent mode
-
-#+BEGIN_SRC emacs-lisp
-
-(defun sk/diminish-org-indent ()
-  (interactive)
-  (diminish 'org-indent-mode ""))
-(add-hook 'org-indent-mode-hook 'sk/diminish-org-indent)
-
-#+END_SRC
-
-** Diminish auto-revert mode
-
-#+BEGIN_SRC emacs-lisp
-
-(defun sk/diminish-auto-revert ()
-  (interactive)
-  (diminish 'auto-revert-mode ""))
-(add-hook 'auto-revert-mode-hook 'sk/diminish-auto-revert)
-
-#+END_SRC
-
-** Diminish eldoc mode
-
-#+BEGIN_SRC emacs-lisp
-
-(defun sk/diminish-eldoc ()
-  (interactive)
-  (diminish 'eldoc-mode ""))
-(add-hook 'eldoc-mode-hook 'sk/diminish-eldoc)
-
-#+END_SRC
-
-** Diminish subword mode
-
-#+BEGIN_SRC emacs-lisp
-
-(defun sk/diminish-subword ()
-  (interactive)
-  (diminish 'subword-mode ""))
-(add-hook 'subword-mode-hook 'sk/diminish-subword)
-
-#+END_SRC
-
-
-* Manage the built-in flyspell mode
-
-#+BEGIN_SRC emacs-lisp
-
-(use-package flyspell
-  :diminish (flyspell-mode . "φ")
-  :bind* (("M-m ] s" . flyspell-goto-next-error)))
-#+END_SRC
-
-* Manage the built-in browser eww
-
-#+BEGIN_SRC emacs-lisp
-
-(use-package eww
-  :bind* (("M-m g x" . eww)
-          ("M-m g :" . eww-browse-with-external-browser)
-          ("M-m g #" . eww-list-histories)
-          ("M-m g {" . eww-back-url)
-          ("M-m g }" . eww-forward-url))
-  :config
-  (progn
-    (add-hook 'eww-mode-hook 'visual-line-mode)))
-#+END_SRC
-
-* Add a package to set the correct path
-
-#+BEGIN_SRC emacs-lisp
-
-(use-package exec-path-from-shell
-  :ensure t
-  :demand t
-  :init
-  (setq exec-path-from-shell-check-startup-files nil)
-  :config
-  ;; (exec-path-from-shell-copy-env "PYTHONPATH")
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize)))
-#+END_SRC
-
-* Add some useful libraries
-
-#+BEGIN_SRC emacs-lisp
-
-(use-package async
-  :ensure t
-  :commands (async-start))
-
-(use-package cl-lib
-  :ensure t)
-
-(use-package dash
-  :ensure t)
-
-(use-package s
-  :ensure t)
-
-#+END_SRC
-
-* Restart emacs from emacs
-
-#+BEGIN_SRC emacs-lisp
-
-(use-package restart-emacs
-  :ensure t
-  :bind* (("C-x M-c" . restart-emacs)))
-#+END_SRC
-
-
-* Bind key to bind some unbound defaults
-
-#+BEGIN_SRC emacs-lisp
-
-(bind-keys*
-  ("C-r"       . dabbrev-expand)
-  ("M-/"       . hippie-expand)
-  ("C-S-d"     . kill-whole-line)
-  ("M-m SPC c" . load-theme)
-  ("M-m SPC R" . locate)
-  ("M-m W"     . winner-undo)
-  ("M-m g m"   . make-frame)
-  ("M-m g M"   . delete-frame)
-  ("M-m g n"   . select-frame-by-name)
-  ("M-m g N"   . set-frame-name)
-  ("M-m B"     . mode-line-other-buffer)
-  ("M-m ="     . indent-region)
-  ("M-m g ("   . Info-prev)
-  ("M-m g )"   . Info-next)
-  ("M-m ^"     . Info-up)
-  ("M-m &"     . Info-goto-node)
-  ("M-m g f"   . find-file-at-point)
-  ("M-m g u"   . downcase-region)
-  ("M-m g U"   . upcase-region)
-  ("M-m g C"   . capitalize-region)
-  ("M-m g F"   . follow-mode)
-  ("M-m R"     . overwrite-mode)
-  ("M-m g j"   . doc-view-next-page)
-  ("M-m g k"   . doc-view-previous-page)
-  ("M-m : t"   . emacs-init-time)
-  ("M-m g q"   . fill-paragraph)
-  ("M-m g @"   . compose-mail)
-  ("M-m SPC ?" . describe-bindings))
-#+END_SRC
-* Tangle on save
-
-#+BEGIN_SRC emacs-lisp
-
-(defun tangle-if-init ()
-  "If the current buffer is 'init.org' the code-blocks are
-    tangled, and the tangled file is compiled."
-
-  (when (string-suffix-p "config.org" (buffer-file-name))
-    (tangle-init)))
-
-(defun tangle-init-sync ()
-  (interactive)
-  (message "Tangling init")
-  ;; Avoid running hooks when tangling.
-  (let ((prog-mode-hook nil)
-        (src  (expand-file-name "config.org" user-emacs-directory))
-        (dest (expand-file-name "config.el"  user-emacs-directory)))
-    (require 'ob-tangle)
-    (org-babel-tangle-file src dest)
-    (if (byte-compile-file dest)
-        (byte-compile-dest-file dest)
-      (with-current-buffer byte-compile-log-buffer
-        (buffer-string)))))
-
-(defun tangle-init ()
-  "Tangle init.org asynchronously."
-
-  (interactive)
-  (message "Tangling init")
-  (async-start
-   (symbol-function #'tangle-init-sync)
-   (lambda (result)
-     (message "Init tangling completed: %s" result))))
-#+END_SRC
-
-
-
-
-
-
-
-* Markdown
-
-#+BEGIN_SRC emacs-lisp
-
-(use-package markdown-mode
-  :ensure t
-  :commands (markdown-mode gfm-mode)
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "multimarkdown"))
-
-#+END_SRC
-* Theme
+** Theme
 
 #+BEGIN_SRC emacs-lisp
 
@@ -674,6 +322,231 @@ Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and
                                               :bold t :height 1.0))))))
 
 #+END_SRC
+
+** Fonts
+
+#+BEGIN_SRC emacs-lisp
+
+(cond ((eq system-type 'gnu/linux)
+       (set-frame-font "DejaVu Sans Mono"))
+      ((eq system-type 'darwin)
+       (set-frame-font "Monaco"))
+      ((eq system-type 'windows-nt)
+       (set-frame-font "Lucida Sans Typewriter")))
+;;; Some convenience font functions
+(defun sk/courier-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "Courier")
+    (set-frame-width (selected-frame) 97))
+(defun sk/georgia-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "Georgia" :height 160))
+(defun sk/hack-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "Hack"))
+(defun sk/monaco-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "Monaco"))
+(defun sk/consolas-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "Consolas"))
+(defun sk/deja-vu-font ()
+  (interactive)
+  (set-face-attribute 'default nil :font "DejaVu Sans Mono"))
+
+;; Font types
+(defun sk/tiny-type ()
+  (interactive)
+  (set-face-attribute 'default nil  :height 150))
+(defun sk/miniscule-type ()
+  (interactive)
+  (set-face-attribute 'default nil  :height 140))
+(defun sk/small-type ()
+  (interactive)
+  (set-face-attribute 'default nil  :height 190)
+  (set-frame-width (selected-frame) 89))
+(defun sk/medium-type ()
+  (interactive)
+  (set-face-attribute 'default nil  :height 215)
+  (set-frame-width (selected-frame) 89))
+(defun sk/large-type ()
+  (interactive)
+  (set-face-attribute 'default nil  :height 350)
+  (set-frame-width (selected-frame) 68))
+
+#+END_SRC
+
+
+
+
+* Window management
+
+#+BEGIN_SRC emacs-lisp
+
+(when (fboundp 'winner-mode)
+  (winner-mode 1))
+
+#+END_SRC
+
+* Recent files
+
+#+BEGIN_SRC emacs-lisp
+
+;; Recentf mode changes
+(setq recentf-max-saved-items 1000
+      recentf-exclude '("/tmp/" "/ssh:"))
+(recentf-mode)
+
+#+END_SRC
+
+* PDF files
+Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and note taking extensively, I actually prefer reading PDFs in Emacs. Not to mention, this is one of the few PDF readers that lets me view the PDF in split-views which is immensely useful while reading research papers.
+
+#+BEGIN_SRC emacs-lisp
+
+(setq doc-view-continuous t)
+
+#+END_SRC
+
+* Use package macro
+
+#+BEGIN_SRC emacs-lisp
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(eval-when-compile
+  (require 'use-package))
+(require 'bind-key)                ;; if you use any :bind variant
+
+#+END_SRC
+
+
+
+* Spell
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package flyspell
+  :diminish (flyspell-mode . "φ")
+  :bind* (("M-m ] s" . flyspell-goto-next-error)))
+#+END_SRC
+
+* Manage the built-in browser eww
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package eww
+  :bind* (("M-m g x" . eww)
+          ("M-m g :" . eww-browse-with-external-browser)
+          ("M-m g #" . eww-list-histories)
+          ("M-m g {" . eww-back-url)
+          ("M-m g }" . eww-forward-url))
+  :config
+  (progn
+    (add-hook 'eww-mode-hook 'visual-line-mode)))
+#+END_SRC
+
+* Add a package to set the correct path
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package exec-path-from-shell
+  :ensure t
+  :demand t
+  :init
+  (setq exec-path-from-shell-check-startup-files nil)
+  :config
+  ;; (exec-path-from-shell-copy-env "PYTHONPATH")
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+#+END_SRC
+
+
+
+* Restart emacs from emacs
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package restart-emacs
+  :ensure t
+  :bind* (("C-x M-c" . restart-emacs)))
+#+END_SRC
+
+
+
+* Tangle on save
+
+#+BEGIN_SRC emacs-lisp
+
+(defun tangle-if-init ()
+  "If the current buffer is 'init.org' the code-blocks are
+    tangled, and the tangled file is compiled."
+
+  (when (string-suffix-p "settings.org" (buffer-file-name))
+    (tangle-init)))
+
+(defun tangle-init-sync ()
+  (interactive)
+  (message "Tangling init")
+  ;; Avoid running hooks when tangling.
+  (let ((prog-mode-hook nil)
+        (src  (expand-file-name "settings.org" user-emacs-directory))
+        (dest (expand-file-name "settings.el"  user-emacs-directory)))
+    (require 'ob-tangle)
+    (org-babel-tangle-file src dest)
+    (if (byte-compile-file dest)
+        (byte-compile-dest-file dest)
+      (with-current-buffer byte-compile-log-buffer
+        (buffer-string)))))
+
+(defun tangle-init ()
+  "Tangle init.org asynchronously."
+
+  (interactive)
+  (message "Tangling init")
+  (async-start
+   (symbol-function #'tangle-init-sync)
+   (lambda (result)
+     (message "Init tangling completed: %s" result))))
+#+END_SRC
+
+
+
+* Markdown
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
+
+#+END_SRC
+
+
+* Programming
+** gdb
+
+#+BEGIN_SRC emacs-lisp
+
+(setq gdb-many-windows t
+      gdb-show-main t)
+
+#+END_SRC
+
+** ediff
+
+#+BEGIN_SRC emacs-lisp
+
+(setq ediff-window-setup-function 'ediff-setup-windows-plain
+      ediff-split-window-function 'split-window-horizontally)
+#+END_SRC
+
+
 * References
 
 1. [[https://github.com/andschwa/.emacs.d.git][Andrew Schwartzmeyer]]

@@ -1,3 +1,28 @@
+# for org
+*.html
+*.eld
+*.dat
+*ido*
+*.html
+*.pdf
+*.tex
+
+eshell
+network-security.data
+.python-environments
+irony
+dmenu-items
+config.el
+recentf
+smex-items
+tramp
+emms
+auto-save-list
+elpa
+custom.el
+history
+settings.el
+
 # Compiled
 *.elc
 
