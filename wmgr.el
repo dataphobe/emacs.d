@@ -187,16 +187,6 @@
   :bind
   ("s-h" . symon-mode))
 
-;;file mgr
-(use-package sunrise-commander
-  :ensure t
-  :init
-    (use-package sunrise-x-buttons :ensure t)
-    (use-package sunrise-x-modeline :ensure t)
-    (setq sr-cursor-follows-mouse nil)
-    (define-key sr-mode-map [mouse-1] nil)
-    (define-key sr-mode-map [mouse-movement] nil)
-    :bind ("s-t" . sunrise))
 
 
 ;;terminal

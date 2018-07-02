@@ -29,7 +29,7 @@ Provent emacs from writing messing up the init.el when I use the [[https://www.g
 
 (with-system gnu/linux
   (message "Free as in Beer")
-  (require 'wmgr))
+  (load "~/.emacs.d/wmgr"))
 
 #+END_SRC
 * Appearance
