@@ -18,6 +18,20 @@ Provent emacs from writing messing up the init.el when I use the [[https://www.g
 
 #+END_SRC
 
+* Window Manager
+#+BEGIN_SRC emacs-lisp
+
+(defmacro with-system (type &rest body)
+  "Evaluate BODY if `system-type' equals TYPE."
+  (declare (indent defun))
+  `(when (eq system-type ',type)
+     ,@body))
+
+(with-system gnu/linux
+  (message "Free as in Beer")
+  (require 'wmgr))
+
+#+END_SRC
 * Appearance
 
 ** Disabling some GUI elements
