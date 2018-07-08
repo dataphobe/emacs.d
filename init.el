@@ -24,11 +24,21 @@
 (setq package-enable-at-startup nil)
 
 ;;; remove SC if you are not using sunrise commander and org if you like outdated packages
-(setq package-archives '(("ELPA"  . "http://tromey.com/elpa/")
-			 ("gnu"   . "http://elpa.gnu.org/packages/")
-			 ("melpa" . "https://melpa.org/packages/")
-			 ("org"   . "https://orgmode.org/elpa/")
-			 ("SC"    . "http://joseito.republika.pl/sunrise-commander/")))
+(setq package-archives
+      '(("ELPA"  . "http://tromey.com/elpa/")
+        ("gnu"   . "http://elpa.gnu.org/packages/")
+        ("melpa stable" . "https://stable.melpa.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")
+        ("org"   . "https://orgmode.org/elpa/")
+        ("SC"    . "http://joseito.republika.pl/sunrise-commander/"))
+      package-archive-priorities
+      '(("melpa stable" . 10)
+	("ELPA" . 6)
+       	("gnu" . 5)
+	("melpa" . 4)
+	("org" . 3)
+        ("SC" . 2)))
+
 (package-initialize)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

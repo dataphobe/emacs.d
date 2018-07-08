@@ -640,7 +640,7 @@ Quickly edit =~/.emacs.d/settings.org=
   (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
 
-** Reloading the configuration
+** Rel0oading the configuration
    
 Simply pressing =Control-c r= will reload this file, very handy.
 You can also manually invoke =config-reload=.
@@ -968,6 +968,7 @@ Edit this list as you see fit!
 
 ** IPython
 
+
 #+BEGIN_SRC emacs-lisp
 
 (use-package ein
@@ -977,6 +978,16 @@ Edit this list as you see fit!
 #+END_SRC
 
 
+** scala
+
+#+BEGIN_SRC  emacs-lisp
+
+(use-package ensime
+  :ensure t)
+;  :pin melpa-stable)
+
+
+#+END_SRC
 * References
 
 1. [[https://github.com/andschwa/.emacs.d.git][Andrew Schwartzmeyer]]

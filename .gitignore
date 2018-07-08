@@ -24,6 +24,7 @@ history
 settings.el
 
 ./request/*
+request/*
 # Compiled
 *.elc
 
