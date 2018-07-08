@@ -23,6 +23,7 @@ custom.el
 history
 settings.el
 
+request/*
 ./request/*
 request/*
 # Compiled
