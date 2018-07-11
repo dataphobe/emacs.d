@@ -803,6 +803,7 @@ Those are all rather self-explanatory.
   (setq org-confirm-babel-evaluate nil)
   (setq org-export-with-smart-quotes t)
   (setq org-src-window-setup 'current-window)
+  (setq org-startup-with-inline-images t)
   (add-hook 'org-mode-hook 'org-indent-mode)
 #+END_SRC
 
@@ -985,6 +986,17 @@ Edit this list as you see fit!
 (use-package ensime
   :ensure t)
 ;  :pin melpa-stable)
+
+
+#+END_SRC
+
+** File browser
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package neotree
+  :ensure t)
+(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
 
 #+END_SRC
