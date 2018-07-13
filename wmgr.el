@@ -113,12 +113,17 @@
   (interactive)
   (start-process "halt" nil "sudo" "halt"))
 
+(defun dataphobe/terminal ()
+  (interactive)
+  (exwm-async-run "termite"))
+
 ;; keybinings to start
 
 (global-set-key (kbd "s-d") 'daedreth/launch-discord)
 (global-set-key (kbd "<s-tab>") 'daedreth/launch-browser)
-(global-set-key (kbd "<XF86ScreenSaver>") 'daedreth/lock-screen)
+(global-set-key (kbd "s-l") 'daedreth/lock-screen)
 (global-set-key (kbd "<XF86PowerOff>") 'daedreth/shutdown)
+(global-set-key (kbd "<s-return>") 'dataphobe/terminal)
 
 ;;Audio controls
 ;;This is a set of bindings to my XF86 keys that invokes pulsemixer with the correct parameters
@@ -179,15 +184,6 @@
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "qutebrowser")
 
-;; system monitor
-;;symon can be toggled on and off with Super + h.
-
-(use-package symon
-  :ensure t
-  :bind
-  ("s-h" . symon-mode))
-
-
 
 ;;terminal
 (defvar my-term-shell "/bin/bash")
@@ -197,7 +193,7 @@
 
 ;;In loving memory of bspwm, Super + Enter opens a new terminal, old habits die hard.
 
-(global-set-key (kbd "<s-return>") 'ansi-term)
+;; (global-set-key (kbd "<s-return>") 'ansi-term)
 
 ;;Basic setup for mpd
 ;;The non XF86 keys are made to be somewhat logical to follow and easy to remember. At the bottom part of the configuration, you will notice how XF86 keys are used by default, so unless you keyboard is broken it should work out of the box. Obviously you might have to adjust server-name and server-port to fit your configuration.

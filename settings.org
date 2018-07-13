@@ -1076,7 +1076,9 @@ Edit this list as you see fit!
 (use-package symon
   :ensure t
   :config
-   (symon-mode 1))
+   (symon-mode 1)
+  :bind
+   ("s-h" . symon-mode))
 
 
 
