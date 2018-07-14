@@ -1050,9 +1050,10 @@ Edit this list as you see fit!
 
 #+BEGIN_SRC  emacs-lisp
 
-(use-package ensime
-  :ensure t)
-;  :pin melpa-stable)
+  (use-package ensime
+    :ensure t)
+  ;  :pin melpa-stable)
+  (setq ensime-startup-notification nil)
 
 
 #+END_SRC
