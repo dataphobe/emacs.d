@@ -753,7 +753,7 @@ C-n and C-p totally work for this.
 #+END_SRC
 * Reading and Writing
 ** PDF files
-Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and note taking extensively, I actually prefer reading PDFs in Emacs. Not to mention, this is one of the few PDF readers that lets me view the PDF in split-views which is immensely useful while reading research papers.
+Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and note taking extensively, I actually prefer reading PDFs in Emacs. Not to mention, this is one of the few PDF readers that lets me view the PDF in split-views which is immensely useful while reading presearch papers.
 
 #+BEGIN_SRC emacs-lisp
 
