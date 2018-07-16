@@ -757,7 +757,7 @@ Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and
 
 #+BEGIN_SRC emacs-lisp
 
-(setq doc-view-continuous t)
+  ;; (setq doc-view-continuous t)
 
 #+END_SRC
 
