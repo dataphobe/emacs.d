@@ -136,9 +136,9 @@ UTF-8 works for most of the files I tend to use
 
 #+BEGIN_SRC emacs-lisp
 
-(setq-default truncate-lines t)
-;;(global-visual-line-mode t) ;; This can mmake tables really ugly in org-mode!!! be careful
-(global-linum-mode t)
+  (setq-default truncate-lines t)
+  ;;(global-visual-line-mode t) ;; This can mmake tables really ugly in org-mode!!! be careful
+  ;; (global-linum-mode t)
 #+END_SRC
 
 ** Large File Warning
