@@ -29,7 +29,7 @@
         ("gnu"   . "http://elpa.gnu.org/packages/")
         ("melpa stable" . "https://stable.melpa.org/packages/")
         ("melpa" . "https://melpa.org/packages/")
-        ("org"   . "https://orgmode.org/elpa/")
+        ("org"   . "https://orgmode.org/elpa/"))
         ("SC"    . "http://joseito.republika.pl/sunrise-commander/"))
       package-archive-priorities
       '(("melpa stable" . 10)
