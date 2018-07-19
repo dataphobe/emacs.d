@@ -18,6 +18,12 @@ Provent emacs from writing messing up the init.el when I use the [[https://www.g
 
 #+END_SRC
 
+** Server
+#+BEGIN_SRC emacs-lisp
+
+(server-start)
+
+#+END_SRC
 * Window Manager
 #+BEGIN_SRC emacs-lisp
 
