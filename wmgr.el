@@ -266,3 +266,8 @@
 ;;  ;; use normal isearch
 ;;  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward))
 
+(defun run-gnome-terminal-here ()
+  (interactive "@")
+  (shell-command (concat "konsole --workdir"
+            (file-name-directory (or load-file-name buffer-file-name)) 
+              " > /dev/null 2>&1 & disown") nil nil))
