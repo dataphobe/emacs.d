@@ -31,6 +31,9 @@ Provent emacs from writing messing up the init.el when I use the [[https://www.g
   (message "Free as in Beer")
   (load "~/.emacs.d/wmgr"))
 
+(with-system darwin
+(load "~/.emacs.d/iterm"))
+
 #+END_SRC
 * Appearance
 
