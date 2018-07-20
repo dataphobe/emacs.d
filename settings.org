@@ -653,7 +653,10 @@ And this quickly deletes a line.
 Emacs is at it's best when it just does things for you, shows you the way, guides you so to speak.
 This can be best achieved using a number of small extensions. While on their own they might not be particularly
 impressive. Together they create a nice environment for you to work in.
-
+** Load the tmp file 
+#+BEGIN_SRC emacs-lisp
+   (load "~/.emacs.d/temp")
+#+END_SRC
 ** Visiting the configuration
 Quickly edit =~/.emacs.d/settings.org=
 #+BEGIN_SRC emacs-lisp

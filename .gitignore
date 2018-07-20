@@ -37,3 +37,4 @@ request/*
 
 # Undo-tree save-files
 *.~undo-tree
+temp.el
