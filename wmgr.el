@@ -117,6 +117,17 @@
   (interactive)
   (exwm-async-run "termite"))
 
+
+(defun open-in-termite ()
+  (interactive)
+  (split-window-right)
+  (balance-windows)
+  (other-window 1)
+  (exwm-async-run "termite"))
+  ;; (shell-command (concat "termite -d"
+  ;;           (file-name-directory (or load-file-name buffer-file-name)) 
+  ;;             " > /dev/null 2>&1 & disown") nil nil))
+
 ;; keybinings to start
 
 (global-set-key (kbd "s-d") 'daedreth/launch-discord)
@@ -266,8 +277,3 @@
 ;;  ;; use normal isearch
 ;;  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward))
 
-(defun run-gnome-terminal-here ()
-  (interactive)
-  (shell-command (concat "termite -d"
-            (file-name-directory (or load-file-name buffer-file-name)) 
-              " > /dev/null 2>&1 & disown") nil nil))
