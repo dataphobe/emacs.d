@@ -14,6 +14,7 @@ Provent emacs from writing messing up the init.el when I use the [[https://www.g
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
+
   (load custom-file))
 
 #+END_SRC
@@ -811,6 +812,9 @@ Emacs has the built-in DocView mode which lets me view PDFs. Since I use Org and
 (use-package flyspell
   :diminish (flyspell-mode . "φ")
   :bind* (("M-m ] s" . flyspell-goto-next-error)))
+(load "~/.emacs.d/typo.el")
+(typo-global-mode 1)
+(add-hook 'text-mode-hook 'typo-mode)
 #+END_SRC
 
 
