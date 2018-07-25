@@ -1084,7 +1084,15 @@ Edit this list as you see fit!
 
 #+END_SRC
 
+** web
+#+BEGIN_SRC emacs-lisp
 
+  (use-package skewer-mode
+    :ensure t)
+  ;  :pin melpa-stable)
+  (setq ensime-startup-notification nil)
+
+#+END_SRC
 ** scala
 
 #+BEGIN_SRC  emacs-lisp
